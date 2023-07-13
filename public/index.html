@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>QR Check In</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="./css/app.css" />
+</head>
+
+<body>
+  <div id="instructions">
+    <div class="qr-reader">
+      <video id="qr-video" class="qr-reader-video" autoplay playsinline></video>
+    </div>
+    <div class="instruction">
+      <p>キーボードで入力するか、会員証のQRコードを読み取ってください。</p>
+    </div>
+  </div>
+  <div class="qr-check-in">
+    <form id="checkInForm" class="member-form">
+      <div id="check-in-data">
+        <div id="idData">
+          <div class="member-form-data">
+            <label for="memberId">ID: (もっている人だけ)</label>
+            <input type="text" name="memberId" id="memberId">
+          </div>
+          <div class="member-form-data">
+            <label for="memberName">なまえ: </label>
+            <input type="text" name="memberName" id="memberName" required>
+          </div>
+        </div>
+        <div id="schoolData">
+          <div class="member-form-data">
+            <label for="schoolChoice1"><input type="radio" id="schoolChoice0" name="memberSchool"
+                value="elem">初等部</label>
+          </div>
+          <div class="member-form-data">
+            <label for="schoolChoice2"><input type="radio" id="schoolChoice1" name="memberSchool"
+                value="junior">中等部</label>
+          </div>
+          <div class="member-form-data">
+            <label for="schoolChoice3"><input type="radio" id="schoolChoice2" name="memberSchool"
+                value="high">高等部</label>
+          </div>
+          <div class="member-form-data">
+            <label for="schoolChoice4"><input type="radio" id="schoolChoice3" name="memberSchool"
+                value="univ">大学</label>
+          </div>
+          <div class="member-form-data">
+            <label for="schoolChoice4"><input type="radio" id="schoolChoice4" name="memberSchool"
+                value="grad">大学院</label>
+          </div>
+          <div class="member-form-data">
+            <label for="schoolChoice6"><input type="radio" id="schoolChoice5" name="memberSchool"
+                value="staff" required>教職員</label>
+          </div>
+          <div class="member-form-data">
+            <label for="memberDetail">学年/学部/部署: </label>
+            <input type="text" name="memberDetail" id="memberDetail" required>
+          </div>
+        </div>
+      </div>
+      <div id="checkInButton" class="member-form-data">
+        <input type="submit" id="memberCheckIn" value="チェックイン">
+      </div>
+    </form>
+    <div id="skillData">
+      <p>スキル</p>
+      <div class="skill-label" id="skill3DPrinterCube">3Dプリンター(Cube)</div>
+      <div class="skill-label" id="skillUvPrinterBirdland">UVプリンター</div>
+      <div class="skill-label" id="skillLaserCutterHelix">レーザーカッター(Helix)</div>
+      <div class="skill-label" id="skillPhotoPrinter">フォトプリンター</div>
+      <div class="skill-label" id="skillLargePrinter">大判プリンター</div>
+      <div class="skill-label" id="skillMonoFab">ミリングマシン(MonoFab)</div>
+      <div class="skill-label" id="skillSingerVivace">刺繍ミシン</div>
+      <div class="skill-label" id="skillSoldering">はんだづけ</div>
+    </div>
+  </div>
+
+  <div id="js-unsupported" class="unsupported">
+    <p class="unsupported-title">Sorry!</p>
+    <p>Unsupported browser</p>
+  </div>
+
+  <script type="text/javascript">
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+  <script src="./js/config.js"></script>
+  <script src="./js/member-register.js"></script>
+  <script src="./js/qr-recorder.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+
+</html>

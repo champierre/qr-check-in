@@ -1,0 +1,150 @@
+*,
+*:before,
+*:after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    background-color: #78b5d4;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: sans-serif;
+}
+
+input {
+    margin: 0.4rem;
+}
+
+#instructions {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+}
+
+.instruction {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2em;
+    font-weight: bold;
+    margin: 0.5em;
+}
+
+.qr-reader {
+    width: 100px;
+    margin: 0 auto;
+}
+
+.qr-reader-video {
+    width: 100%;
+    -webkit-transform: scaleX(-1);
+    transform: scaleX(-1);
+}
+
+#check-in-data {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 24px 6%;
+    margin: 20px;
+}
+
+#idData {
+    border: solid #003cff 1px;
+    background-color: #63d8ff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 600px;
+}
+
+#schoolData {
+    border: solid #003cff 1px;
+    background-color: #63d8ff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 600px;
+}
+
+.member-form-data {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 200px;
+    margin: 10px;
+}
+
+#checkInButton {
+    margin: 0 auto;
+    padding: 2px;
+    font-size: 1.2em;
+    font-weight: bold;
+    background-color: #4973fc;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+#skillData {
+    border: solid #003cff 1px;
+    background-color: #63d8ff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    width: 100%;
+    max-width: 600px;
+}
+
+.skill-label {
+    font-weight: bold;
+    font-size: 1.2em;
+    margin: 0.2em;
+    opacity: 0.1;
+}
+
+.skill-label.is-on {
+    opacity: 1.0;
+}
+
+.skill-label.is-off {
+    opacity: 0.4;
+}
+
+.unsupported {
+    display: none;
+    flex-direction: column;
+    position: fixed;
+    justify-content: center;
+    align-items: center;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100%;
+    background: #000;
+    color: #fff;
+    z-index: 999;
+}
+
+.unsupported.is-show {
+    display: flex;
+}
+
+.unsupported-title {
+    font-weight: bold;
+    font-size: 2em;
+}
