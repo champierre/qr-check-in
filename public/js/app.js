@@ -62,25 +62,12 @@ async function updateMemberInfo(memberId) {
     const memberData = await memberRegister.find(memberId)
     if (memberData) {
         document.querySelector('#memberName').value = memberData.memberName;
-        const schoolChoice = document.getElementsByName('memberSchool');
-        if (memberData.memberSchool === '初等部') {
-            schoolChoice[0].checked = true;
-        }
-        if (memberData.memberSchool === '中等部') {
-            schoolChoice[1].checked = true;
-        }
-        if (memberData.memberSchool === '高等部') {
-            schoolChoice[2].checked = true;
-        }
-        if (memberData.memberSchool === '大学') {
-            schoolChoice[3].checked = true;
-        }
-        if (memberData.memberSchool === '大学院') {
-            schoolChoice[4].checked = true;
-        }
-        if (memberData.memberSchool === '教職員') {
-            schoolChoice[5].checked = true;
-        }
+        const schoolChoiceElements = document.getElementsByName('memberSchool');
+        schoolChoiceElements.forEach(choice => {
+            if (choice.value === memberData.memberSchool) {
+                choice.checked = true;
+            }
+        });
         document.querySelector('#memberDetail').value = memberData.memberDetail;
         updateSkillStatus(memberData);
     } else {
