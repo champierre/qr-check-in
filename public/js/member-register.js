@@ -1,3 +1,10 @@
+
+/**
+ * column list
+ * @type {Array<string>} list of column name
+ */
+const columnList = ['email', 'name', 'school', 'detail', 'card type', 'card URL', 'ID', 'register date', 'update date', '3D printer Sermoon V1', 'UV printer birdland', 'laser cutter Helix', 'photo printer', 'A1 printer', 'milling MonoFab', 'sewing Vivace', 'soldering'];
+
 class MemberRegister {
     constructor() {
         this.findUrl = ''
@@ -14,22 +21,23 @@ class MemberRegister {
         if (response.ok) {
             const data = await response.json()
             const member = {
-                memberName: data[0],
-                memberSchool: data[1],
-                memberDetail: data[2],
-                cardType: data[3],
-                cardURL: data[4],
-                memberId: data[5],
-                registerDate: data[6],
-                updateDate: data[7],
-                skill3DPrinterCube: data[8],
-                skillUvPrinterBirdland: data[9],
-                skillLaserCutterHelix: data[10],
-                skillPhotoPrinter: data[11],
-                skillLargePrinter: data[12],
-                skillMonoFab: data[13],
-                skillSingerVivace: data[14],
-                skillSoldering: data[15],
+                memberEmail: data[columnList.indexOf('email')],
+                memberName: data[columnList.indexOf('name')],
+                memberSchool: data[columnList.indexOf('school')],
+                memberDetail: data[columnList.indexOf('detail')] ,
+                cardType: data[columnList.indexOf('card type')],
+                cardURL: data[columnList.indexOf('card URL')],
+                memberId: data[columnList.indexOf('ID')],
+                registerDate: data[columnList.indexOf('register date')],
+                updateDate: data[columnList.indexOf('update date')],
+                skill3DPrinterSermoon: data[columnList.indexOf('3D printer Sermoon V1')],
+                skillUvPrinterBirdland: data[columnList.indexOf('UV printer birdland')],
+                skillLaserCutterHelix: data[columnList.indexOf('laser cutter Helix')],
+                skillPhotoPrinter: data[columnList.indexOf('photo printer')],
+                skillA1Printer: data[columnList.indexOf('A1 printer')],
+                skillMillingMonoFab: data[columnList.indexOf('milling MonoFab')],
+                skillSewingVivace: data[columnList.indexOf('sewing Vivace')],
+                skillSoldering: data[columnList.indexOf('soldering')],
             }
             return member
         } else {

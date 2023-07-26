@@ -43,7 +43,7 @@ checkInForm.addEventListener("submit", async ev => {
  * @param {Object} memberData member data
  */
 function updateSkillStatus(memberData) {
-    const skillNames = ['skill3DPrinterCube', 'skillUvPrinterBirdland', 'skillLaserCutterHelix', 'skillPhotoPrinter', 'skillLargePrinter', 'skillMonoFab', 'skillSingerVivace', 'skillSoldering'];
+    const skillNames = ['skill3DPrinterSermoon', 'skillUvPrinterBirdland', 'skillLaserCutterHelix', 'skillPhotoPrinter', 'skillA1Printer', 'skillMillingMonoFab', 'skillSewingVivace', 'skillSoldering'];
     skillNames.forEach(skillName => {
         if (memberData[skillName] === 1) {
             document.querySelector(`#${skillName}`).classList.add('is-on');
