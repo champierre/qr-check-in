@@ -14,30 +14,37 @@ const qrCheckIn = new QRCheckIn()
 const checkInForm = document.getElementById("checkInForm");
 checkInForm.addEventListener("submit", async ev => {
     ev.preventDefault();
-
-    const formData = new FormData(checkInForm);
-    const memberData = Object.fromEntries(formData.entries());
-
-    console.log(memberData);
-
-    if (memberData.memberName === '') {
-        alert('「なまえ」を入力してください');
-        return;
-    }
-
-    try {
-        const result = await memberRegister.checkIn(memberData);
-        alert(`チェックインしました! ${result.id}: ${memberData.memberName} ${result.timestamp}`);
-        // 完了時に入力値をクリア
-        checkInForm.reset();
-        updateSkillStatus({});
-
-    } catch (e) {
-        console.log(e);
-        alert(`チェックインできませんでした(T_T) ${memberData.memberId}: ${memberData.memberName} ${(new Date()).toLocaleTimeString()}`);
-    }
+    await doCheckIn();
 });
 
+/**
+ * Do check-in from form data.
+ * @returns {Promise<void>}
+ */
+async function doCheckIn() {
+    
+        const formData = new FormData(checkInForm);
+        const memberData = Object.fromEntries(formData.entries());
+    
+        console.log(memberData);
+    
+        if (memberData.memberName === '') {
+            alert('「なまえ」を入力してください');
+            return;
+        }
+    
+        try {
+            const result = await memberRegister.checkIn(memberData);
+            alert(`チェックインしました! ${result.id}: ${memberData.memberName} ${result.timestamp}`);
+            // 完了時に入力値をクリア
+            checkInForm.reset();
+            updateSkillStatus({});
+    
+        } catch (e) {
+            console.log(e);
+            alert(`チェックインできませんでした(T_T) ${memberData.memberId}: ${memberData.memberName} ${(new Date()).toLocaleTimeString()}`);
+        }
+}
 /**
  * Update skill status from member data.
  * @param {Object} memberData member data
@@ -70,6 +77,7 @@ async function updateMemberInfo(memberId) {
         });
         document.querySelector('#memberDetail').value = memberData.memberDetail;
         updateSkillStatus(memberData);
+        await doCheckIn(); // auto check-in
     } else {
         document.querySelector('#memberName').value = '見つかりません'
     }
