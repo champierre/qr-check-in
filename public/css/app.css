@@ -148,3 +148,17 @@ input {
     font-weight: bold;
     font-size: 2em;
 }
+
+/* Notification */
+#notification-check-in {
+    display: none;
+    position: fixed;
+    padding: 4rem;
+    top: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgb(149, 221, 247);
+    color: #000000;
+    font-family: helvetica;
+    border-radius: 3px;
+}

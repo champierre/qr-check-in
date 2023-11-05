@@ -18,32 +18,47 @@ checkInForm.addEventListener("submit", async ev => {
 });
 
 /**
+ * Check-in sound
+ */
+const checkInSuccessSound = new Audio();
+checkInSuccessSound.src = './js/check-in-success.mp3';
+
+/**
+ * Check-in failed sound
+ */
+const checkInFailSound = new Audio();
+checkInFailSound.src = './js/check-in-fail.mp3';
+
+/**
  * Do check-in from form data.
  * @returns {Promise<void>}
  */
 async function doCheckIn() {
-    
-        const formData = new FormData(checkInForm);
-        const memberData = Object.fromEntries(formData.entries());
-    
-        console.log(memberData);
-    
-        if (memberData.memberName === '') {
-            alert('「なまえ」を入力してください');
-            return;
-        }
-    
-        try {
-            const result = await memberRegister.checkIn(memberData);
-            alert(`チェックインしました! ${result.id}: ${memberData.memberName} ${result.timestamp}`);
-            // 完了時に入力値をクリア
-            checkInForm.reset();
-            updateSkillStatus({});
-    
-        } catch (e) {
-            console.log(e);
-            alert(`チェックインできませんでした(T_T) ${memberData.memberId}: ${memberData.memberName} ${(new Date()).toLocaleTimeString()}`);
-        }
+    const formData = new FormData(checkInForm);
+    const memberData = Object.fromEntries(formData.entries());
+
+    console.log(memberData);
+
+    if (memberData.memberName === '') {
+        alert('「なまえ」を入力してください');
+        return;
+    }
+
+    try {
+        const result = await memberRegister.checkIn(memberData);
+        checkInSuccessSound.play();
+        document.getElementById('notification-check-in').style.display = 'block';
+        setTimeout(function () {
+            document.getElementById('notification-check-in').style.display = 'none'
+        }, 3000);
+        // 完了時に入力値をクリア
+        checkInForm.reset();
+        updateSkillStatus({});
+    } catch (e) {
+        console.log(e);
+        checkInFailSound.play();
+        alert(`チェックインできませんでした(T_T) ${memberData.memberId}: ${memberData.memberName} ${(new Date()).toLocaleTimeString()}`);
+    }
 }
 /**
  * Update skill status from member data.
