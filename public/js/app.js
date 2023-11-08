@@ -9,55 +9,117 @@ const memberRegister = new MemberRegister()
 memberRegister.findUrl = config.findUrl
 memberRegister.checkInUrl = config.checkInUrl
 
-const qrCheckIn = new QRCheckIn()
-
 const checkInForm = document.getElementById("checkInForm");
+
+/**
+ * Get member info from form.
+ * @returns {Object} member info
+ */
+function getMemberInfo() {
+    const formData = new FormData(checkInForm);
+    const memberInfo = Object.fromEntries(formData.entries());
+    return memberInfo;
+}
+
+/**
+ * Check-in form submit event
+ * @param {Event} ev event
+ */
 checkInForm.addEventListener("submit", async ev => {
     ev.preventDefault();
-    await doCheckIn();
+    const memberId = document.getElementById("memberId").value;
+    if (memberId.length === 4) {
+        await updateMemberInfo(memberId);
+    }
+    const memberInfo = getMemberInfo();
+    await doCheckIn(memberInfo);
 });
 
 /**
  * Check-in sound
+ * @type {Audio}
  */
 const checkInSuccessSound = new Audio();
 checkInSuccessSound.src = './js/check-in-success.mp3';
 
 /**
  * Check-in failed sound
+ * @type {Audio}
  */
 const checkInFailSound = new Audio();
 checkInFailSound.src = './js/check-in-fail.mp3';
 
 /**
+ * QR detected sound
+ * @type {Audio}
+ */
+const qrDetectedSound = new Audio();
+qrDetectedSound.src = './js/qr-detected.mp3';
+
+/**
+ * Clear member info
+ */
+function clearMemberInfo() {
+    checkInForm.reset();
+    updateSkillStatus({});
+}
+
+/**
+ * Check if member is already checked in.
+ * @param {string} memberId member ID
+ * @returns {boolean} true if already checked in
+ */
+function isAlreadyCheckedIn(memberId) {
+    if (lastCheckInCode === memberId) {
+        if ((Date.now() - lastCheckInTime) < (1000 * 60 * 60)) {
+            // less than 1 hour
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
  * Do check-in from form data.
+ * @param {Object} memberInfo member info
  * @returns {Promise<void>}
  */
-async function doCheckIn() {
-    const formData = new FormData(checkInForm);
-    const memberData = Object.fromEntries(formData.entries());
-
-    console.log(memberData);
-
-    if (memberData.memberName === '') {
+async function doCheckIn(memberInfo) {
+    if (!memberInfo) {
+        return;
+    }
+    if (memberInfo.memberName === '') {
         alert('「なまえ」を入力してください');
         return;
     }
-
+    if (isAlreadyCheckedIn(memberInfo.memberId)) {
+        checkInFailSound.play();
+        return new Promise(resolve => {
+            document.getElementById('notification-already-checked-in').style.display = 'block';
+            setTimeout(function () {
+                document.getElementById('notification-already-checked-in').style.display = 'none';
+                clearMemberInfo();
+                resolve();
+            }, 2000);
+        });
+    }
     try {
-        const result = await memberRegister.checkIn(memberData);
+        const result = await memberRegister.checkIn(memberInfo);
+        lastCheckInCode = memberInfo.memberId;
+        lastCheckInTime = Date.now();
         checkInSuccessSound.play();
-        document.getElementById('notification-check-in').style.display = 'block';
-        setTimeout(function () {
-            document.getElementById('notification-check-in').style.display = 'none'
-        }, 3000);
-        // 完了時に入力値をクリア
-        checkInForm.reset();
-        updateSkillStatus({});
+        return new Promise(resolve => {
+            document.getElementById('notification-check-in').style.display = 'block';
+            setTimeout(function () {
+                document.getElementById('notification-check-in').style.display = 'none';
+                clearMemberInfo();
+                resolve();
+            }, 3000);
+        });
     } catch (e) {
         console.log(e);
         checkInFailSound.play();
-        alert(`チェックインできませんでした(T_T) ${memberData.memberId}: ${memberData.memberName} ${(new Date()).toLocaleTimeString()}`);
+        alert(`チェックインできませんでした(T_T) ${memberInfo.memberId}: ${memberInfo.memberName} ${(new Date()).toLocaleTimeString()}`);
     }
 }
 /**
@@ -80,6 +142,8 @@ function updateSkillStatus(memberData) {
  * @param {string} id member ID
  */
 async function updateMemberInfo(memberId) {
+    const memberIdInput = document.querySelector('#memberId');
+    memberIdInput.value = memberId
     document.querySelector('#memberName').value = ''
     const memberData = await memberRegister.find(memberId)
     if (memberData) {
@@ -92,7 +156,6 @@ async function updateMemberInfo(memberId) {
         });
         document.querySelector('#memberDetail').value = memberData.memberDetail;
         updateSkillStatus(memberData);
-        await doCheckIn(); // auto check-in
     } else {
         document.querySelector('#memberName').value = '見つかりません'
     }
@@ -108,4 +171,69 @@ document.querySelector('#memberId').addEventListener('change', async ev => {
     }
 });
 
-qrCheckIn.startDetection(document.querySelector('#qr-video'))
+
+const html5QrCode = new Html5Qrcode(/* element id */ "reader");
+let lastCheckInCode = '';
+let lastCheckInTime = 0;
+let isReadyForScan = true;
+
+/**
+ * Callback when QR code is detected.
+ * @param {string} decodedText decoded text
+ * @param {Object} decodedResult decoded result
+ */
+async function onScanSuccess(decodedText, decodedResult) {
+    if (!isReadyForScan) {
+        return;
+    }
+    if (decodedText.length !== 4) {
+        // not member ID
+        return;
+    }
+    isReadyForScan = false;
+    qrDetectedSound.play();
+    console.log(`Code matched = ${decodedText}`, decodedResult);
+    await updateMemberInfo(decodedText);
+    const memberInfo = getMemberInfo();
+    await doCheckIn(memberInfo); // auto check-in
+    isReadyForScan = true;
+}
+
+/**
+ * Calculate QR code finder box size.
+ */
+var qrBoxFunction = function (viewfinderWidth, viewfinderHeight) {
+    // Square QR Box, with size = 80% of the min edge.
+    var minEdgeSizeThreshold = 250;
+    var edgeSizePercentage = 0.75;
+    var minEdgeSize = (viewfinderWidth > viewfinderHeight) ?
+        viewfinderHeight : viewfinderWidth;
+    var qrBoxEdgeSize = Math.floor(minEdgeSize * edgeSizePercentage);
+    if (qrBoxEdgeSize < minEdgeSizeThreshold) {
+        if (minEdgeSize < minEdgeSizeThreshold) {
+            return { width: minEdgeSize, height: minEdgeSize };
+        } else {
+            return {
+                width: minEdgeSizeThreshold,
+                height: minEdgeSizeThreshold
+            };
+        }
+    }
+    return { width: qrBoxEdgeSize, height: qrBoxEdgeSize };
+}
+
+/**
+ * Create QR code scanner.
+ */
+let html5QrcodeScanner = new Html5QrcodeScanner(
+    "reader",
+    {
+        fps: 10,
+        qrbox: qrBoxFunction,
+        rememberLastUsedCamera: true,
+        formatsToSupport: [
+            Html5QrcodeSupportedFormats.QR_CODE,
+        ],
+    });
+
+html5QrcodeScanner.render(onScanSuccess);

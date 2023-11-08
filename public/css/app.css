@@ -22,7 +22,6 @@ input {
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    height: 100px;
 }
 
 .instruction {
@@ -32,17 +31,6 @@ input {
     font-size: 1.2em;
     font-weight: bold;
     margin: 0.5em;
-}
-
-.qr-reader {
-    width: 100px;
-    margin: 0 auto;
-}
-
-.qr-reader-video {
-    width: 100%;
-    -webkit-transform: scaleX(-1);
-    transform: scaleX(-1);
 }
 
 #check-in-data {
@@ -149,6 +137,12 @@ input {
     font-size: 2em;
 }
 
+#reader {
+    width: 60%;
+    margin: auto;
+    padding: 0px;
+}
+
 /* Notification */
 #notification-check-in {
     display: none;
@@ -158,6 +152,19 @@ input {
     left: 50%;
     transform: translateX(-50%);
     background-color: rgb(149, 221, 247);
+    color: #000000;
+    font-family: helvetica;
+    border-radius: 3px;
+}
+
+#notification-already-checked-in {
+    display: none;
+    position: fixed;
+    padding: 4rem;
+    top: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgb(234, 247, 149);
     color: #000000;
     font-family: helvetica;
     border-radius: 3px;
