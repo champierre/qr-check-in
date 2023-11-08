@@ -1,3 +1,6 @@
+/**
+ * @fileoverview member register
+ */
 
 /**
  * column list
@@ -78,3 +81,5 @@ async function retryWithDelay(fn, retries = 3, interval = 50, finalErr = 'Retry 
         return retryWithDelay(fn, (retries - 1), interval, finalErr)
     }
 }
+
+export { MemberRegister };
