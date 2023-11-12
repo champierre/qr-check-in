@@ -4,7 +4,8 @@
   "description": "This is a simple member check-in system built using Google Apps Script and Google Sheets.",
   "main": "public/js/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "http-server ./public -S -C ./cert/localhost+3.pem -K ./cert/localhost+3-key.pem"
   },
   "repository": {
     "type": "git",
@@ -20,5 +21,8 @@
   "bugs": {
     "url": "https://github.com/yokobond/qr-check-in/issues"
   },
-  "homepage": "https://github.com/yokobond/qr-check-in#readme"
+  "homepage": "https://github.com/yokobond/qr-check-in#readme",
+  "dependencies": {
+    "http-server": "^14.1.1"
+  }
 }
