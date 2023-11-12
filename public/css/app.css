@@ -138,9 +138,8 @@ input {
 }
 
 #reader {
-    width: 60%;
+    width: 300px;
     margin: auto;
-    padding: 0px;
 }
 
 /* Notification */

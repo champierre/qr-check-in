@@ -207,8 +207,8 @@ async function onScanSuccess(decodedText, decodedResult) {
  */
 var qrBoxFunction = function (viewfinderWidth, viewfinderHeight) {
     // Square QR Box, with size = 80% of the min edge.
-    var minEdgeSizeThreshold = 250;
-    var edgeSizePercentage = 0.75;
+    var minEdgeSizeThreshold = 200;
+    var edgeSizePercentage = 0.80;
     var minEdgeSize = (viewfinderWidth > viewfinderHeight) ?
         viewfinderHeight : viewfinderWidth;
     var qrBoxEdgeSize = Math.floor(minEdgeSize * edgeSizePercentage);
