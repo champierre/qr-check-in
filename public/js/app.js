@@ -240,3 +240,6 @@ let html5QrcodeScanner = new Html5QrcodeScanner(
     });
 
 html5QrcodeScanner.render(onScanSuccess);
+
+// disable skill data for temporarily
+document.querySelector('#skillData').style.display = 'none';
