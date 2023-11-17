@@ -2,9 +2,6 @@
  * @fileOverview QR code check-in
  */
 
-import { config } from './config.js';
-import { MemberRegister } from './member-register.js';
-
 /**
  * @type {MemberRegister}
  */
