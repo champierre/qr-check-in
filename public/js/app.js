@@ -111,9 +111,11 @@ async function doCheckIn(memberInfo) {
         });
     }
     try {
-        const result = await memberRegister.checkIn(memberInfo);
+        const prevLastCheckInCode = lastCheckInCode;
+        const prevLastCheckInTime = lastCheckInTime;
         lastCheckInCode = memberInfo.memberId;
         lastCheckInTime = Date.now();
+        const result = await memberRegister.checkIn(memberInfo);
         checkInSuccessSound.play();
         return new Promise(resolve => {
             document.getElementById('notification-check-in').style.display = 'block';
@@ -125,6 +127,8 @@ async function doCheckIn(memberInfo) {
         });
     } catch (e) {
         console.log(e);
+        lastCheckInCode = prevLastCheckInCode;
+        lastCheckInTime = prevLastCheckInTime;
         checkInFailSound.play();
         alert(`チェックインできませんでした(T_T) ${memberInfo.memberId}: ${memberInfo.memberName} ${(new Date()).toLocaleTimeString()}`);
     }
