@@ -2,53 +2,9 @@
 
 This is a simple member check-in system built using Google Apps Script and Google Sheets. The system allows members to check-in by providing their member ID, name, school, and other details. The check-in data is then stored in a Google Sheet for record-keeping purposes.
 
-## Getting Started
-
-### Prerequisites
-
-install clasp
-
-```cmd
-npm install -g @google/clasp
-```
-
-install mkcert
-
-for windows
-```cmd
-choco install mkcert
-```
-
-### installation
-
-To get started with this project, you will need to have a Google account and access to Google Sheets. This project uses clasp to manage the Google Apps Script project, so you will also need to have Node.js and npm installed on your computer.
-
-Once you have copied the code, you will need to create a new Google Sheet with the files `Data.csv` and `CheckIn.csv` in the `gas` folder. You can then create a new Google Apps Script project and link it to the Google Sheet using clasp.
-
-use mkcert to create a local CA
-```cmd
-mkcert -install
-```
-
-use mkcert to create a local certificate
-```cmd
-mkdir cert
-cd cert
-mkcert localhost 127.0.0.1 ::1
-```
-
-install dependencies
-```bash
-npm install
-```
-
-
 ## Usage
 
-start a local server
-```bash
-npm run start
-```
+Open `open.html` in your browser and click the link to open the check-in page.
 
 ## Mechanism
 
