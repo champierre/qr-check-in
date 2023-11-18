@@ -13,10 +13,11 @@ const checkInForm = document.getElementById("checkInForm");
 
 /**
  * Get member info from form.
+ * @param {HTMLFormElement} form form element
  * @returns {Object} member info
  */
-function getMemberInfo() {
-    const formData = new FormData(checkInForm);
+function getMemberInfo(form) {
+    const formData = new FormData(form);
     const memberInfo = Object.fromEntries(formData.entries());
     return memberInfo;
 }
@@ -31,7 +32,7 @@ checkInForm.addEventListener("submit", async ev => {
     if (memberId.length === 4) {
         await updateMemberInfo(memberId);
     }
-    const memberInfo = getMemberInfo();
+    const memberInfo = getMemberInfo(checkInForm);
     await doCheckIn(memberInfo);
 });
 
@@ -194,7 +195,7 @@ async function onScanSuccess(decodedText, decodedResult) {
     qrDetectedSound.play();
     console.log(`Code matched = ${decodedText}`, decodedResult);
     await updateMemberInfo(decodedText);
-    const memberInfo = getMemberInfo();
+    const memberInfo = getMemberInfo(checkInForm);
     await doCheckIn(memberInfo); // auto check-in
     isReadyForScan = true;
 }
