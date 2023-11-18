@@ -3,52 +3,6 @@
  */
 
 /**
- * Get config from URL.
- * @returns {Object} config
- */
-function getConfig() {
-    const data = {};
-    const url = new URL(window.location.href);
-    data.findUrl = url.searchParams.get('findUrl');
-    data.checkInUrl = url.searchParams.get('checkInUrl');
-    return data;
-}
-
-const config = getConfig();
-
-/**
- * @type {MemberRegister}
- */
-const memberRegister = new MemberRegister(config.findUrl, config.checkInUrl);
-
-const checkInForm = document.getElementById("checkInForm");
-
-/**
- * Get member info from form.
- * @param {HTMLFormElement} form form element
- * @returns {Object} member info
- */
-function getMemberInfo(form) {
-    const formData = new FormData(form);
-    const memberInfo = Object.fromEntries(formData.entries());
-    return memberInfo;
-}
-
-/**
- * Check-in form submit event
- * @param {Event} ev event
- */
-checkInForm.addEventListener("submit", async ev => {
-    ev.preventDefault();
-    const memberId = document.getElementById("memberId").value;
-    if (memberId.length === 4) {
-        await updateMemberInfo(memberId);
-    }
-    const memberInfo = getMemberInfo(checkInForm);
-    await doCheckIn(memberInfo);
-});
-
-/**
  * Check-in sound
  * @type {Audio}
  */
@@ -68,6 +22,46 @@ checkInFailSound.src = './js/check-in-fail.mp3';
  */
 const qrDetectedSound = new Audio();
 qrDetectedSound.src = './js/qr-detected.mp3';
+
+/**
+ * Get config from URL.
+ * @returns {Object} config
+ */
+function getConfig() {
+    const data = {};
+    const url = new URL(window.location.href);
+    data.findUrl = url.searchParams.get('findUrl');
+    data.checkInUrl = url.searchParams.get('checkInUrl');
+    return data;
+}
+
+/**
+ * Config data
+ * @type {Object}
+ */
+const config = getConfig();
+
+/**
+ * @type {MemberRegister}
+ */
+const memberRegister = new MemberRegister(config.findUrl, config.checkInUrl);
+
+/**
+ * Check-in form
+ * @type {HTMLFormElement}
+ */
+const checkInForm = document.getElementById("checkInForm");
+
+/**
+ * Get member info from form.
+ * @param {HTMLFormElement} form form element
+ * @returns {Object} member info
+ */
+function getMemberInfo(form) {
+    const formData = new FormData(form);
+    const memberInfo = Object.fromEntries(formData.entries());
+    return memberInfo;
+}
 
 /**
  * Clear member info
@@ -135,6 +129,7 @@ async function doCheckIn(memberInfo) {
         alert(`チェックインできませんでした(T_T) ${memberInfo.memberId}: ${memberInfo.memberName} ${(new Date()).toLocaleTimeString()}`);
     }
 }
+
 /**
  * Update skill status from member data.
  * @param {Object} memberData member data
@@ -175,6 +170,20 @@ async function updateMemberInfo(memberId) {
 }
 
 /**
+ * Check-in form submit event
+ * @param {Event} ev event
+ */
+checkInForm.addEventListener("submit", async ev => {
+    ev.preventDefault();
+    const memberId = document.getElementById("memberId").value;
+    if (memberId.length === 4) {
+        await updateMemberInfo(memberId);
+    }
+    const memberInfo = getMemberInfo(checkInForm);
+    await doCheckIn(memberInfo);
+});
+
+/**
  * Watch ID field and update member info
  */
 document.querySelector('#memberId').addEventListener('change', async ev => {
@@ -184,10 +193,28 @@ document.querySelector('#memberId').addEventListener('change', async ev => {
     }
 });
 
-
+/**
+ * HTML5 QR code scanner
+ * @type {Html5Qrcode}
+ */
 const html5QrCode = new Html5Qrcode(/* element id */ "reader");
+
+/**
+ * Last check-in code
+ * @type {string}
+ */
 let lastCheckInCode = '';
+
+/**
+ * Last check-in time
+ * @type {number}
+ */
 let lastCheckInTime = 0;
+
+/**
+ * Flag for ready to scan
+ * @type {boolean}
+ */
 let isReadyForScan = true;
 
 /**
