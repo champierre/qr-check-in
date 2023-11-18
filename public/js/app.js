@@ -87,11 +87,20 @@ function isAlreadyCheckedIn(memberId) {
 }
 
 /**
+ * Flag for processing check-in
+ * @type {boolean}
+ */
+let processingCheckIn = false;
+
+/**
  * Do check-in from form data.
  * @param {Object} memberInfo member info
  * @returns {Promise<void>}
  */
 async function doCheckIn(memberInfo) {
+    if (processingCheckIn) {
+        return;
+    }
     if (!memberInfo) {
         return;
     }
@@ -111,6 +120,7 @@ async function doCheckIn(memberInfo) {
         });
     }
     try {
+        processingCheckIn = true;
         const prevLastCheckInCode = lastCheckInCode;
         const prevLastCheckInTime = lastCheckInTime;
         lastCheckInCode = memberInfo.memberId;
@@ -122,6 +132,7 @@ async function doCheckIn(memberInfo) {
             setTimeout(function () {
                 document.getElementById('notification-check-in').style.display = 'none';
                 clearMemberInfo();
+                processingCheckIn = false;
                 resolve();
             }, 3000);
         });
@@ -131,6 +142,7 @@ async function doCheckIn(memberInfo) {
         lastCheckInTime = prevLastCheckInTime;
         checkInFailSound.play();
         alert(`チェックインできませんでした(T_T) ${memberInfo.memberId}: ${memberInfo.memberName} ${(new Date()).toLocaleTimeString()}`);
+        processingCheckIn = false;
     }
 }
 
