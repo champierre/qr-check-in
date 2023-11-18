@@ -3,11 +3,23 @@
  */
 
 /**
+ * Get config from URL.
+ * @returns {Object} config
+ */
+function getConfig() {
+    const data = {};
+    const url = new URL(window.location.href);
+    data.findUrl = url.searchParams.get('findUrl');
+    data.checkInUrl = url.searchParams.get('checkInUrl');
+    return data;
+}
+
+const config = getConfig();
+
+/**
  * @type {MemberRegister}
  */
-const memberRegister = new MemberRegister()
-memberRegister.findUrl = config.findUrl
-memberRegister.checkInUrl = config.checkInUrl
+const memberRegister = new MemberRegister(config.findUrl, config.checkInUrl);
 
 const checkInForm = document.getElementById("checkInForm");
 

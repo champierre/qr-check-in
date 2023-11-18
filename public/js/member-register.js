@@ -9,9 +9,9 @@
 const columnList = ['email', 'name', 'school', 'detail', 'card type', 'card URL', 'ID', 'register date', 'update date', '3D printer Sermoon V1', 'UV printer birdland', 'laser cutter Helix', 'photo printer', 'A1 printer', 'milling MonoFab', 'sewing Vivace', 'soldering'];
 
 class MemberRegister {
-    constructor() {
-        this.findUrl = ''
-        this.checkInUrl = ''
+    constructor(findUrl = '', checkInUrl = '') {
+        this.findUrl = findUrl;
+        this.checkInUrl = checkInUrl;
     }
 
     /**
@@ -27,7 +27,7 @@ class MemberRegister {
                 memberEmail: data[columnList.indexOf('email')],
                 memberName: data[columnList.indexOf('name')],
                 memberSchool: data[columnList.indexOf('school')],
-                memberDetail: data[columnList.indexOf('detail')] ,
+                memberDetail: data[columnList.indexOf('detail')],
                 cardType: data[columnList.indexOf('card type')],
                 cardURL: data[columnList.indexOf('card URL')],
                 memberId: data[columnList.indexOf('ID')],
