@@ -2,9 +2,18 @@
 
 This is a simple member check-in system built using Google Apps Script and Google Sheets. The system allows members to check-in by providing their member ID, name, school, and other details. The check-in data is then stored in a Google Sheet for record-keeping purposes.
 
-## Usage
+## Getting Started
+
+### Setting Up the Google Sheet
+
+Add the Google Sheets `member-list` and `member-log` to your Google Drive with the scripts using clasp.
+
+Edit `open.html` to use your Google Apps Script ID.
+
+### Open the Check-In Page
 
 Open `open.html` in your browser and click the link to open the check-in page.
+
 
 ## Mechanism
 
