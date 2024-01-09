@@ -210,12 +210,6 @@ document.querySelector('#memberId').addEventListener('change', async ev => {
 });
 
 /**
- * HTML5 QR code scanner
- * @type {Html5Qrcode}
- */
-const html5QrCode = new Html5Qrcode(/* element id */ "reader");
-
-/**
  * Last check-in code
  * @type {string}
  */
@@ -290,6 +284,7 @@ let html5QrcodeScanner = new Html5QrcodeScanner(
         formatsToSupport: [
             Html5QrcodeSupportedFormats.QR_CODE,
         ],
+        disableFlip: true,
     });
 
 html5QrcodeScanner.render(onScanSuccess);
