@@ -142,6 +142,10 @@ input {
     margin: auto;
 }
 
+video {
+    transform: scaleX(-100%);
+}
+
 /* Notification */
 #notification-check-in {
     display: none;
