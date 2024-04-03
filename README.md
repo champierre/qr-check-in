@@ -7,12 +7,13 @@ This is a simple member check-in system built using Google Apps Script and Googl
 ### Setting Up the Google Sheet
 
 Add the Google Sheets `member-list` and `member-log` to your Google Drive with the scripts using clasp.
-
-Edit `open.html` to use your Google Apps Script ID.
+Then, deploy the scripts as a web app and get the URL of the web app.
 
 ### Open the Check-In Page
 
-Open `open.html` in your browser and click the link to open the check-in page.
+1. Replace `findUrl` in `open.html` with the URL of the Google Apps Script of the `member-list`.
+2. Replace `checkInUrl` in `open.html` with the URL of the Google Apps Script of the `member-log`.
+3. Open `open.html` in your browser and click the link to open the check-in page.
 
 
 ## Mechanism
