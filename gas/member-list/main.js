@@ -121,7 +121,7 @@ function updateCardsByRange(range) {
             id = newId;
             console.log(`Generate ID "${newId}" on row: ${startRow + i}`);
         }
-        const qrURL = 'http://chart.apis.google.com/chart?chs=200x200&cht=qr&chl=' + id;
+        const qrURL = 'https://quickchart.io/qr?size=200x200&text=' + id;
         const cardName = `${id}`;
         // clean up the previous cards
         const oldCards = DriveApp.getFilesByName(cardName);
