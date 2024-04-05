@@ -1,5 +1,11 @@
 const activeSpreadSheet = SpreadsheetApp.getActiveSpreadsheet();
 
+/**
+ * Respond to GET requests to the published web app
+ * - 'find' action: return member data
+ * @param {GoogleAppsScript.Events.DoGet} e event parameter
+ * @returns {GoogleAppsScript.Content.TextOutput} output
+ */
 function doGet(e) {
     const reqParam = e.parameter;//パラメーターを取得
     switch (reqParam.action) {//actionパラメーターの内容によって処理を分岐
@@ -19,7 +25,9 @@ function doGet(e) {
     }
 }
 
-// デバッグ用の関数
+/**
+ * Test doGet
+ */
 function doGetTest() {
     //eの作成
     var e = {};
@@ -31,7 +39,8 @@ function doGetTest() {
     doGet(e);
 }
 
-/** column list
+/**
+ * column list
  * @type {Array<string>} column list
  */
 const columnList = ['email', 'name', 'school', 'detail', 'card printed', 'card type', 'card URL', 'ID', 'register date', 'update date', '3D printer Sermoon V1', 'UV printer birdland', 'laser cutter Helix', 'photo printer', 'A1 printer', 'milling MonoFab', 'sewing Vivace', 'soldering'];
@@ -43,6 +52,11 @@ const cardURLColumn = columnList.indexOf('card URL') + 1;
 const idColumn = columnList.indexOf('ID') + 1;
 const registerDateColumn = columnList.indexOf('register date') + 1;
 
+/**
+ * Get member data by ID
+ * @param {string} memberId member ID
+ * @returns {?Array} member data or null if not found
+ */
 function getMemberData(memberId) {
     const dataSheet = activeSpreadSheet.getSheetByName('Data');
     const data = dataSheet.getDataRange().getValues();
@@ -70,10 +84,17 @@ function getMemberDataByEmail(email) {
     return null;
 }
 
+/**
+ * Test getMemberData
+ */
 function testGetMemeberData() {
     console.log(getMemberData('0d6v'));
 }
 
+/**
+ * Handle open event
+ * - Add menu for membership
+ */
 function onOpen() {
     const ui = SpreadsheetApp.getUi();
     const menu = ui.createMenu('Membership');
@@ -81,6 +102,14 @@ function onOpen() {
     menu.addToUi();
 }
 
+/**
+ * Fill template slide page with data
+ * @param {GoogleAppsScript.Slides.Slide} slide slide
+ * @param {string} id member ID
+ * @param {string} qrURL QR code URL
+ * @param {string} name member name
+ * @returns {void}
+ */
 function fillSlide(slide, id, qrURL, name) {
     slide.getPageElements().forEach(elm => {
         // Logger.log(elm.getPageElementType());
@@ -100,6 +129,14 @@ function fillSlide(slide, id, qrURL, name) {
     })
 }
 
+/**
+ * Fill card data
+ * @param {GoogleAppsScript.Slides.Presentation} card card
+ * @param {string} id member ID
+ * @param {string} qrURL QR code URL
+ * @param {string} name member name
+ * @returns {void}
+ */
 function fillCardData(card, id, qrURL, name) {
     const slides = card.getSlides();
     slides.forEach(sld => {
@@ -107,6 +144,11 @@ function fillCardData(card, id, qrURL, name) {
     });
 }
 
+/**
+ * Update cards by range
+ * @param {GoogleAppsScript.Spreadsheet.Range} range range
+ * @returns {void}
+ */
 function updateCardsByRange(range) {
     const dataSheet = activeSpreadSheet.getSheetByName('Data');
     const startRow = range.getRow();
@@ -156,6 +198,10 @@ function updateCardsByRange(range) {
     }
 }
 
+/**
+ * Update cards by selection
+ * @returns {void}
+ */
 function updateCardsBySelection() {
     const dataSheet = activeSpreadSheet.getActiveSheet();
     const ranges = dataSheet.getSelection().getActiveRangeList().getRanges();
@@ -164,6 +210,9 @@ function updateCardsBySelection() {
     });
 }
 
+/**
+ * Test updateCardsBySelection
+ */
 function testSelection() {
     var activeSheet = SpreadsheetApp.getActiveSheet();
     var rangeList = activeSheet.getRangeList(['A1:B4', 'D1:E4']);
@@ -182,6 +231,9 @@ function testSelection() {
     console.log('Active Sheet: ' + selection.getActiveSheet().getName());
 }
 
+/**
+ * Fill all empty card URL of the data sheet
+ */
 function fillEmptyCardUrl() {
     const dataSheet = activeSpreadSheet.getSheetByName('Data');
     const dataRange = dataSheet.getDataRange();
@@ -189,7 +241,7 @@ function fillEmptyCardUrl() {
 }
 
 /**
- * Generate ID
+ * Generate new unique ID
  */
 function generateMemberId() {
     const characters = "abcdefghijklmnopqrstuvwxyz";
@@ -205,10 +257,9 @@ function generateMemberId() {
     return memberId;
 }
 
-function testGenerateMemberId() {
-    console.log(generateMemberId());
-}
-
+/**
+ * Fill all empty member ID of the data sheet
+ */
 function fillEmptyMemberId() {
     const dataSheet = activeSpreadSheet.getSheetByName('Data');
     const firstRow = 2;
