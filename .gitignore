@@ -198,3 +198,4 @@ dist
 # Clasp
 /.clasprc.json
 .clasp.json
+env/
