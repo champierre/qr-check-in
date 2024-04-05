@@ -34,7 +34,7 @@ function doGetTest() {
 /** column list
  * @type {Array<string>} column list
  */
-const columnList = ['email', 'name', 'school', 'detail', 'card type', 'card URL', 'ID', 'register date', 'update date', '3D printer Sermoon V1', 'UV printer birdland', 'laser cutter Helix', 'photo printer', 'A1 printer', 'milling MonoFab', 'sewing Vivace', 'soldering'];
+const columnList = ['email', 'name', 'school', 'detail', 'card printed', 'card type', 'card URL', 'ID', 'register date', 'update date', '3D printer Sermoon V1', 'UV printer birdland', 'laser cutter Helix', 'photo printer', 'A1 printer', 'milling MonoFab', 'sewing Vivace', 'soldering'];
 
 const emailColumn = columnList.indexOf('email') + 1;
 const nameColumn = columnList.indexOf('name') + 1;
@@ -54,6 +54,22 @@ function getMemberData(memberId) {
     return null;
 }
 
+/**
+ * Get member data by email
+ * @param {string} email email
+ * @returns {?Array} member data or null if not found
+ */
+function getMemberDataByEmail(email) {
+    const dataSheet = activeSpreadSheet.getSheetByName('Data');
+    const data = dataSheet.getDataRange().getValues();
+    for (let i = 0; i < data.length; i++) {
+        if (data[i][emailColumn - 1] == email) {
+            return data[i];
+        }
+    }
+    return null;
+}
+
 function testGetMemeberData() {
     console.log(getMemberData('0d6v'));
 }
@@ -61,8 +77,7 @@ function testGetMemeberData() {
 function onOpen() {
     const ui = SpreadsheetApp.getUi();
     const menu = ui.createMenu('Membership');
-    menu.addItem('Create Cards', 'fillEmptyCardUrl')
-    // menu.addItem('Fill empty ID', 'fillEmptyMemberId')
+    menu.addItem('Create Cards', 'createCards');
     menu.addToUi();
 }
 
@@ -206,4 +221,34 @@ function fillEmptyMemberId() {
             console.log(newId);
         }
     }
+}
+
+/**
+ * Copy registered data to data sheet when the email is not found
+ */
+function copyRegisterToData() {
+    const registerSheet = activeSpreadSheet.getSheetByName('Register');
+    const dataSheet = activeSpreadSheet.getSheetByName('Data');
+    const registerFirstRow = 2;
+    const registerLastRow = registerSheet.getLastRow();
+    const registerEmailColumn = 2;
+    for (let i = registerFirstRow; i <= registerLastRow; i++) {
+        let email = registerSheet.getRange(i, registerEmailColumn);
+        if (!email.isBlank()) {
+            let memberData = getMemberDataByEmail(email.getValue());
+            if (memberData) {
+                continue;
+            }
+        }
+        const data = registerSheet.getRange(i, 2, 1, registerSheet.getLastColumn() - 1).getValues();
+        dataSheet.getRange(dataSheet.getLastRow() + 1, 1, 1, data[0].length).setValues(data);
+    }
+}
+
+/**
+ * Create cards
+ */
+function createCards() {
+    copyRegisterToData();
+    fillEmptyCardUrl();
 }
