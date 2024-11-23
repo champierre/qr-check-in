@@ -245,16 +245,40 @@ function fillEmptyCardUrl() {
  */
 function generateMemberId() {
     const characters = "abcdefghijklmnopqrstuvwxyz";
-    let memberId = `${(new Date()).getFullYear() - 2023}`;
+    const dataSheet = activeSpreadSheet.getSheetByName('Data');
+    const data = dataSheet.getDataRange().getValues();
+    const idHeader = `${(new Date()).getFullYear() - 2023}`;
+    let memberId;
     while (true) {
+        memberId = idHeader;
         memberId += characters.charAt(Math.floor(Math.random() * characters.length));
         memberId += Math.floor(Math.random() * 10);
         memberId += characters.charAt(Math.floor(Math.random() * characters.length));
-        if (!getMemberData(memberId)) {
+        let exist = false;
+        for (let i = 0; i < data.length; i++) {
+            if (data[i][idColumn - 1] == memberId) {
+                Logger.log(`ID ${memberId} already exists`);
+                exist = true;
+                break;
+            }
+        }
+        if (!exist) {
             break;
         }
     }
     return memberId;
+}
+
+/**
+ * Test generateMemberId
+ */
+function testGenerateMemberId() {
+  const ids = [];
+  let count = 0;
+  while(count < 10) {
+    ids.push(generateMemberId());
+  }
+  Logger.log(ids);
 }
 
 /**
