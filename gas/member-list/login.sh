@@ -6,12 +6,12 @@ cd $(dirname $0)
 # login先を明示的に設定
 if [[ $RUNNING_MODE = dev ]]; then
     # login先を開発環境に変更
-    SCRIPT_ID=$SCRIPT_ID_DEV
+    # SCRIPT_ID=$SCRIPT_ID_DEV
     # 設定を反映
     cp ./env/clasp_dev.json .clasp.json
 elif [[ $RUNNING_MODE = prod ]]; then
     # login先を本番環境に変更
-    SCRIPT_ID=$SCRIPT_ID_PROD
+    # SCRIPT_ID=$SCRIPT_ID_PROD
     # 設定を反映
     cp ./env/clasp_prod.json .clasp.json
 else
