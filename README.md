@@ -45,3 +45,4 @@ This project is licensed under the MIT License - see the `LICENSE` file for deta
 ## Acknowledgments
 
 - This project was developed by the need for a simple member check-in system for Aogaku Tukumana Lab.
+
