@@ -47,6 +47,11 @@ const config = getConfig();
 const memberRegister = new MemberRegister(config.findUrl, config.checkInUrl);
 
 /**
+ * @type {FaceRecognition}
+ */
+const faceRecognition = new FaceRecognition();
+
+/**
  * Check-in form
  * @type {HTMLFormElement}
  */
@@ -168,7 +173,7 @@ function updateSkillStatus(memberData) {
 async function updateMemberInfo(memberId) {
     const memberIdInput = document.querySelector('#memberId');
     memberIdInput.value = memberId
-    document.querySelector('#memberName').value = ''
+    // document.querySelector('#memberName').value = ''
     const memberData = await memberRegister.find(memberId)
     if (memberData) {
         document.querySelector('#memberName').value = memberData.memberName;
@@ -184,6 +189,31 @@ async function updateMemberInfo(memberId) {
         document.querySelector('#memberName').value = '見つかりません'
     }
 }
+
+/**
+ * Check for face recognition periodically
+ */
+async function checkFaceRecognition() {
+    if (!isReadyForScan) {
+        return;
+    }
+    
+    try {
+        const recognizedMemberId = await faceRecognition.recognizeFace();
+        if (recognizedMemberId) {
+            console.log(`Face recognized: ${recognizedMemberId}`);
+            await updateMemberInfo(recognizedMemberId);
+        }
+    } catch (error) {
+        console.error('Error in face recognition:', error);
+    }
+    
+    // Check again after a delay
+    setTimeout(checkFaceRecognition, 1000);
+}
+
+// Start face recognition check
+setTimeout(checkFaceRecognition, 1000);
 
 /**
  * Check-in form submit event
@@ -291,3 +321,8 @@ html5QrcodeScanner.render(onScanSuccess);
 
 // disable skill data for temporarily
 document.querySelector('#skillData').style.display = 'none';
+
+document.getElementById('memberRegisterFace').addEventListener('click', async () => {
+    const registrationId = document.getElementById('registrationId').value;
+    await faceRecognition.registerFace(registrationId);
+});

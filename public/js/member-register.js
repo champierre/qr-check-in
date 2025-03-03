@@ -60,6 +60,29 @@ class MemberRegister {
         }
         return await retryWithDelay(posting, 3, 200, 'check in failed')
     }
+
+    async registerFace(faceData) {
+        const registerFaceData = { action: 'registerFace', ...faceData }
+        const posting = async () => {
+            const res = await fetch(this.findUrl, {
+                method: "POST",
+                body: JSON.stringify(registerFaceData),
+            });
+            const resData = await res.json();
+            return resData;
+        }
+        return await retryWithDelay(posting, 3, 200, 'Registering face failed');
+    }
+
+    async faces() {
+        const response = await fetch(this.findUrl + '?action=faces')
+        if (response.ok) {
+            const data = await response.json();
+            return data;
+        } else {
+            return null;
+        }
+    }
 }
 
 function wait(ms) {
