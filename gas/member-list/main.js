@@ -376,15 +376,46 @@ function createFace(faceData) {
   const memberData = getMemberData(faceData.memberId);
   
   if (memberData) {
-    // Member exists, proceed with adding face data
+    // Member exists, proceed with face data
     const dataSheet = activeSpreadSheet.getSheetByName('Faces');
+    const data = dataSheet.getDataRange().getValues();
     const timestamp = toDateTimeEntry(Date.now());
-    dataSheet.appendRow([
-      timestamp,
-      faceData.memberId,
-      faceData.descriptor
-    ]);
-    return {timestamp: timestamp, id: faceData.memberId, descriptor: faceData.descriptor };
+    
+    // Check if there's already a face record with this memberId
+    let existingRowIndex = -1;
+    for (let i = 0; i < data.length; i++) {
+      if (data[i][1] === faceData.memberId) {
+        existingRowIndex = i;
+        break;
+      }
+    }
+    
+    if (existingRowIndex !== -1) {
+      // Update existing row
+      // Add 1 to account for 1-based indexing in Sheets API
+      const rowNumber = existingRowIndex + 1;
+      dataSheet.getRange(rowNumber, 1).setValue(timestamp); // Update timestamp
+      dataSheet.getRange(rowNumber, 3).setValue(faceData.descriptor); // Update descriptor
+      return {
+        updated: true,
+        timestamp: timestamp,
+        id: faceData.memberId,
+        descriptor: faceData.descriptor
+      };
+    } else {
+      // Add new row
+      dataSheet.appendRow([
+        timestamp,
+        faceData.memberId,
+        faceData.descriptor
+      ]);
+      return {
+        added: true,
+        timestamp: timestamp,
+        id: faceData.memberId,
+        descriptor: faceData.descriptor
+      };
+    }
   } else {
     // Member does not exist, return error message
     return {error: true, message: `No user information found for ID: ${faceData.memberId}`};
