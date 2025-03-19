@@ -37,7 +37,7 @@ class FaceRecognition {
      * Load face descriptors from Google Spreadsheet
      */
     async loadFaceData() {
-        const faceData = await memberRegister.faces();
+        const faceData = await memberRegister.getFaces();
         if (faceData) {
             try {
                 this.faceDescriptors = Object.fromEntries(
@@ -48,62 +48,6 @@ class FaceRecognition {
                 console.error('Error parsing face descriptors from Google Spreadsheet:', error);
                 this.faceDescriptors = {};
             }
-        }
-    }
-
-    /**
-     * Register a face for a member ID
-     * @param {string} registrationId - Registration ID
-     * @returns {Promise<boolean>} - True if registration was successful
-     */
-    async registerFace(registrationId) {
-        if (!this.isModelLoaded) {
-            console.error('Face recognition models not loaded yet');
-            alert('顔認識モデルがまだロードされていません。しばらくお待ちください。');
-            return false;
-        }
-
-        if (!registrationId) {
-            alert('登録用IDを入力してください。');
-            return false;
-        }
-
-        try {
-            // Get the video element from the QR scanner
-            const videoElement = document.querySelector('#reader video');
-            if (!videoElement || !videoElement.srcObject) {
-                alert('カメラが起動していません。QRコードスキャナーを起動してください。');
-                return false;
-            }
-
-            // Detect faces in the video
-            const detections = await faceapi.detectSingleFace(
-                videoElement, 
-                new faceapi.TinyFaceDetectorOptions()
-            ).withFaceLandmarks().withFaceDescriptor();
-
-            if (!detections) {
-                alert('顔情報が検出されませんでした。カメラに顔を向けてください。');
-                return false;
-            }
-
-            // Store the face descriptor with the registration ID
-            this.faceDescriptors[registrationId] = Array.from(detections.descriptor);
-
-            const faceData = { memberId: registrationId, descriptor: JSON.stringify(Array.from(detections.descriptor)) };
-            memberRegister.registerFace(faceData);
-
-            // Show success notification
-            document.getElementById('notification-face-register').style.display = 'block';
-            setTimeout(function () {
-                document.getElementById('notification-face-register').style.display = 'none';
-            }, 3000);
-
-            return true;
-        } catch (error) {
-            console.error('Error registering face:', error);
-            alert('顔情報の登録中にエラーが発生しました。');
-            return false;
         }
     }
 
