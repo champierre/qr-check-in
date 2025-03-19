@@ -32,6 +32,7 @@ function getConfig() {
     const url = new URL(window.location.href);
     data.findUrl = url.searchParams.get('findUrl');
     data.checkInUrl = url.searchParams.get('checkInUrl');
+    data.faceRegisterUrl = url.searchParams.get('faceRegisterUrl');
     return data;
 }
 
@@ -40,6 +41,40 @@ function getConfig() {
  * @type {Object}
  */
 const config = getConfig();
+
+/**
+ * Update face registration link if URL is provided
+ */
+if (config.faceRegisterUrl) {
+    const faceRegisterLink = document.querySelector('#instructions .instruction p a');
+    if (faceRegisterLink) {
+        faceRegisterLink.href = config.faceRegisterUrl;
+    }
+}
+
+/**
+ * Update face registration link with member ID
+ * @param {string} memberId - Member ID to add to the link
+ */
+function updateFaceRegisterLink(memberId) {
+    if (!config.faceRegisterUrl || !memberId) {
+        return;
+    }
+    
+    const faceRegisterLink = document.querySelector('#instructions .instruction p a');
+    if (faceRegisterLink) {
+        // Create URL object to properly handle query parameters
+        const url = new URL(config.faceRegisterUrl);
+        // Add or update the memberId parameter
+        url.searchParams.set('memberId', memberId);
+        // Add the findUrl parameter if available
+        if (config.findUrl) {
+            url.searchParams.set('findUrl', config.findUrl);
+        }
+        // Update the link href
+        faceRegisterLink.href = url.toString();
+    }
+}
 
 /**
  * @type {MemberRegister}
@@ -173,7 +208,7 @@ function updateSkillStatus(memberData) {
 async function updateMemberInfo(memberId) {
     const memberIdInput = document.querySelector('#memberId');
     memberIdInput.value = memberId
-    // document.querySelector('#memberName').value = ''
+    document.querySelector('#memberName').value = ''
     const memberData = await memberRegister.find(memberId)
     if (memberData) {
         document.querySelector('#memberName').value = memberData.memberName;
@@ -185,6 +220,9 @@ async function updateMemberInfo(memberId) {
         });
         document.querySelector('#memberDetail').value = memberData.memberDetail;
         updateSkillStatus(memberData);
+        
+        // Update face registration link with the member ID
+        updateFaceRegisterLink(memberId);
     } else {
         document.querySelector('#memberName').value = '見つかりません'
     }
@@ -201,11 +239,10 @@ async function checkFaceRecognition() {
     try {
         const recognizedMemberId = await faceRecognition.recognizeFace();
         if (recognizedMemberId) {
-            console.log(`Face recognized: ${recognizedMemberId}`);
             await updateMemberInfo(recognizedMemberId);
         }
     } catch (error) {
-        console.error('Error in face recognition:', error);
+        // Error handling
     }
     
     // Check again after a delay
@@ -234,8 +271,24 @@ checkInForm.addEventListener("submit", async ev => {
  */
 document.querySelector('#memberId').addEventListener('change', async ev => {
     const memberId = ev.target.value;
+    
     if (memberId.length === 4) {
+        // Update face registration link directly with the member ID
+        // This ensures the link is updated even if the API call fails
+        updateFaceRegisterLink(memberId);
+        
+        // Continue with the normal flow
         await updateMemberInfo(memberId);
+    }
+});
+
+// Also add an input event listener to catch more input changes
+document.querySelector('#memberId').addEventListener('input', ev => {
+    const memberId = ev.target.value;
+    
+    if (memberId.length === 4) {
+        // Update face registration link directly with the member ID
+        updateFaceRegisterLink(memberId);
     }
 });
 
@@ -272,7 +325,11 @@ async function onScanSuccess(decodedText, decodedResult) {
     }
     isReadyForScan = false;
     qrDetectedSound.play();
-    console.log(`Code matched = ${decodedText}`, decodedResult);
+    
+    // Update face registration link directly with the member ID
+    // This ensures the link is updated even if the API call fails
+    updateFaceRegisterLink(decodedText);
+    
     await updateMemberInfo(decodedText);
     const memberInfo = getMemberInfo(checkInForm);
     await doCheckIn(memberInfo); // auto check-in
