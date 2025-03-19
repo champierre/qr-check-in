@@ -16,6 +16,19 @@ function doGet(e) {
                 return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON);
             }
             break;
+        case "getFaces":
+            {
+                const dataSheet = activeSpreadSheet.getSheetByName('Faces');
+                const data = dataSheet.getDataRange().getValues();
+                const result = {};
+                const dataWithoutHeader = data.slice(1);
+                dataWithoutHeader.forEach(row => {
+                  result[row[1]] = row[2];
+                });
+
+                return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+            }
+            break;
         default:
             {
                 const result = 'did nothing';
@@ -326,4 +339,45 @@ function copyRegisterToData() {
 function createCards() {
     copyRegisterToData();
     fillEmptyCardUrl();
+}
+
+function doPost(e) {
+  const reqParam = JSON.parse(e.postData.getDataAsString());
+
+  switch (reqParam.action) {
+    case "createFace":
+      {
+        const result = createFace(reqParam);
+        return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+      }
+      break;
+    default:
+      {
+        const result = 'did nothing';
+        return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+      }
+      break;
+  }
+}
+
+function toDateTimeEntry(epochTime) {
+  const date = new Date(epochTime);
+  //get timezone of spreadsheet
+  var tz = SpreadsheetApp.getActiveSpreadsheet().getSpreadsheetTimeZone();
+
+  //format date to readable format
+  var formatted = Utilities.formatDate(date, tz, 'yyyy/MM/dd HH:mm:ss');
+
+  return formatted;
+}
+
+function createFace(faceData) {
+  const dataSheet = activeSpreadSheet.getSheetByName('Faces');
+  const timestamp = toDateTimeEntry(Date.now());
+  dataSheet.appendRow([
+    timestamp,
+    faceData.memberId,
+    faceData.descriptor
+  ]);
+  return {timestamp: timestamp, id: faceData.memberId, descriptor: faceData.descriptor };
 }
