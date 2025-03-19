@@ -372,12 +372,21 @@ function toDateTimeEntry(epochTime) {
 }
 
 function createFace(faceData) {
-  const dataSheet = activeSpreadSheet.getSheetByName('Faces');
-  const timestamp = toDateTimeEntry(Date.now());
-  dataSheet.appendRow([
-    timestamp,
-    faceData.memberId,
-    faceData.descriptor
-  ]);
-  return {timestamp: timestamp, id: faceData.memberId, descriptor: faceData.descriptor };
+  // Check if member data exists for the given ID
+  const memberData = getMemberData(faceData.memberId);
+  
+  if (memberData) {
+    // Member exists, proceed with adding face data
+    const dataSheet = activeSpreadSheet.getSheetByName('Faces');
+    const timestamp = toDateTimeEntry(Date.now());
+    dataSheet.appendRow([
+      timestamp,
+      faceData.memberId,
+      faceData.descriptor
+    ]);
+    return {timestamp: timestamp, id: faceData.memberId, descriptor: faceData.descriptor };
+  } else {
+    // Member does not exist, return error message
+    return {error: true, message: `No user information found for ID: ${faceData.memberId}`};
+  }
 }
