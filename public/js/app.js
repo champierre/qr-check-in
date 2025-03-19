@@ -238,7 +238,9 @@ async function checkFaceRecognition() {
     
     try {
         const recognizedMemberId = await faceRecognition.recognizeFace();
-        if (recognizedMemberId) {
+        const memberIdInput = document.querySelector('#memberId');
+        if (recognizedMemberId && memberIdInput.value != recognizedMemberId) {
+            memberIdInput.value = recognizedMemberId;
             await updateMemberInfo(recognizedMemberId);
         }
     } catch (error) {
