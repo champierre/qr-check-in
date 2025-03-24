@@ -243,12 +243,12 @@ async function checkFaceRecognition() {
       // Error handling
     } finally {
       // Check again after a delay
-      setTimeout(checkFaceRecognition, 1000);
+      setTimeout(checkFaceRecognition, 500);
     }
 }
 
 // Start face recognition check
-setTimeout(checkFaceRecognition, 1000);
+setTimeout(checkFaceRecognition, 500);
 
 /**
  * Check-in form submit event

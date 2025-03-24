@@ -79,7 +79,7 @@ class FaceRecognition {
             }
 
             if (detections.detection) {
-                const qrElement = document.getElementById('qr-shaded-region');
+                const qrElement = document.getElementById('reader__scan_region');
                 const resizedDetection = faceapi.resizeResults(detections.detection, {
                     width: qrElement.clientWidth,
                     height: qrElement.clientHeight
@@ -99,8 +99,8 @@ class FaceRecognition {
                         qrElement.appendChild(rect);
                     }
 
-                    // Position the rectangle
-                    rect.style.left = `${box.x}px`;
+                    // Position the rectangle (horizontally flipped)
+                    rect.style.left = `${qrElement.clientWidth - box.x - box.width}px`;
                     rect.style.top = `${box.y}px`;
                     rect.style.width = `${box.width}px`;
                     rect.style.height = `${box.height}px`;
