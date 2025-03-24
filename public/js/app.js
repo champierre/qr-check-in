@@ -232,10 +232,6 @@ async function updateMemberInfo(memberId) {
  * Check for face recognition periodically
  */
 async function checkFaceRecognition() {
-    if (!isReadyForScan) {
-        return;
-    }
-    
     try {
         const recognizedMemberId = await faceRecognition.recognizeFace();
         const memberIdInput = document.querySelector('#memberId');
@@ -244,11 +240,11 @@ async function checkFaceRecognition() {
             await updateMemberInfo(recognizedMemberId);
         }
     } catch (error) {
-        // Error handling
+      // Error handling
+    } finally {
+      // Check again after a delay
+      setTimeout(checkFaceRecognition, 1000);
     }
-    
-    // Check again after a delay
-    setTimeout(checkFaceRecognition, 1000);
 }
 
 // Start face recognition check
