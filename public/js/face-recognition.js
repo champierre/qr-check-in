@@ -78,6 +78,35 @@ class FaceRecognition {
                 return null;
             }
 
+            if (detections.detection) {
+                const qrElement = document.getElementById('qr-shaded-region');
+                const resizedDetection = faceapi.resizeResults(detections.detection, {
+                    width: qrElement.clientWidth,
+                    height: qrElement.clientHeight
+                });
+                const box = resizedDetection.box;
+
+                if (qrElement) {
+                    // Create a div for the face rectangle if it doesn't exist
+                    let rect = document.getElementById('face-rectangle');
+                    if (!rect) {
+                        rect = document.createElement('div');
+                        rect.id = 'face-rectangle';
+                        rect.style.position = 'absolute';
+                        rect.style.border = '2px solid #00FF00';
+                        // rect.style.boxSizing = 'border-box';
+                        rect.style.zIndex = '1000';
+                        qrElement.appendChild(rect);
+                    }
+
+                    // Position the rectangle
+                    rect.style.left = `${box.x}px`;
+                    rect.style.top = `${box.y}px`;
+                    rect.style.width = `${box.width}px`;
+                    rect.style.height = `${box.height}px`;
+                }
+            }
+
             // Compare with stored face descriptors
             const currentDescriptor = detections.descriptor;
             let bestMatch = null;
