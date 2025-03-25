@@ -75,6 +75,11 @@ class FaceRecognition {
             ).withFaceLandmarks().withFaceDescriptor();
 
             if (!detections) {
+                // Hide the face rectangle if it exists when no face is detected
+                const rect = document.getElementById('face-rectangle');
+                if (rect) {
+                    rect.style.display = 'none';
+                }
                 return null;
             }
 
@@ -94,11 +99,13 @@ class FaceRecognition {
                         rect.id = 'face-rectangle';
                         rect.style.position = 'absolute';
                         rect.style.border = '2px solid #00FF00';
-                        // rect.style.boxSizing = 'border-box';
                         rect.style.zIndex = '1000';
                         qrElement.appendChild(rect);
                     }
 
+                    // Show the rectangle
+                    rect.style.display = 'block';
+                    
                     // Position the rectangle (horizontally flipped)
                     rect.style.left = `${qrElement.clientWidth - box.x - box.width}px`;
                     rect.style.top = `${box.y}px`;
