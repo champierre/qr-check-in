@@ -9,6 +9,8 @@ class FaceRecognition {
     constructor() {
         this.isModelLoaded = false;
         this.faceDescriptors = {};
+        this.lastFaceDetectionTime = Date.now();
+        this.noFaceTimeout = null;
         this.loadFaceData();
         this.initModels();
     }
@@ -52,6 +54,35 @@ class FaceRecognition {
     }
 
     /**
+     * Clear the recognized member ID and related fields
+     */
+    clearRecognizedId() {
+        // Clear member ID
+        const memberIdInput = document.getElementById('memberId');
+        if (memberIdInput) {
+            memberIdInput.value = '';
+        }
+        
+        // Clear name field
+        const nameInput = document.getElementById('memberName');
+        if (nameInput) {
+            nameInput.value = '';
+        }
+        
+        // Clear grade/faculty/department field
+        const gradeInput = document.getElementById('memberDetail');
+        if (gradeInput) {
+            gradeInput.value = '';
+        }
+        
+        // Deselect all radio buttons
+        const radioButtons = document.querySelectorAll('input[type="radio"]');
+        radioButtons.forEach(radio => {
+            radio.checked = false;
+        });
+    }
+
+    /**
      * Recognize a face and return the matching member ID
      * @returns {Promise<string|null>} - Member ID if recognized, null otherwise
      */
@@ -80,7 +111,30 @@ class FaceRecognition {
                 if (rect) {
                     rect.style.display = 'none';
                 }
+
+                // Start timer to clear ID if no face is detected for 5 seconds
+                const currentTime = Date.now();
+                if (!this.noFaceTimeout) {
+                    this.noFaceTimeout = setTimeout(() => {
+                        // If 5 seconds have passed since last face detection, clear the ID
+                        
+                        if (currentTime - this.lastFaceDetectionTime >= 5000) {
+                            this.clearRecognizedId();
+                        }
+                        this.noFaceTimeout = null;
+                    }, 2000);
+                }
+                
                 return null;
+            }
+
+            // Face detected, update the last detection time
+            this.lastFaceDetectionTime = Date.now();
+            
+            // Clear the timeout if it exists
+            if (this.noFaceTimeout) {
+                clearTimeout(this.noFaceTimeout);
+                this.noFaceTimeout = null;
             }
 
             if (detections.detection) {
