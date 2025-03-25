@@ -152,7 +152,7 @@ class FaceRecognition {
                         rect = document.createElement('div');
                         rect.id = 'face-rectangle';
                         rect.style.position = 'absolute';
-                        rect.style.border = '2px solid #00FF00';
+                        rect.style.border = '2px solid #00FF00'; // Default green
                         rect.style.zIndex = '1000';
                         qrElement.appendChild(rect);
                     }
@@ -182,6 +182,20 @@ class FaceRecognition {
                 if (distance < bestDistance) {
                     bestDistance = distance;
                     bestMatch = memberId;
+                }
+            }
+
+            // Change rectangle color based on face recognition result
+            const rect = document.getElementById('face-rectangle');
+            if (rect) {
+                if (bestMatch === null && Object.keys(this.faceDescriptors).length > 0) {
+                    // Face detected but not recognized - red frame
+                    rect.style.border = '2px solid #FF0000';
+                    // Clear fields when unrecognized face is detected
+                    this.clearRecognizedId();
+                } else {
+                    // Face recognized or no face data available - green frame
+                    rect.style.border = '2px solid #00FF00';
                 }
             }
 
