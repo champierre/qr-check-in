@@ -179,6 +179,8 @@ class FaceRecognition {
             const currentDescriptor = detections.descriptor;
             let bestMatch = null;
             let bestDistance = 0.6; // Threshold for face recognition (lower is more strict)
+            let confidence = 0;
+            const minimumConfidence = 50; // Minimum confidence threshold (50%)
 
             for (const [memberId, descriptor] of Object.entries(this.faceDescriptors)) {
                 const distance = faceapi.euclideanDistance(
@@ -188,7 +190,20 @@ class FaceRecognition {
                 
                 if (distance < bestDistance) {
                     bestDistance = distance;
-                    bestMatch = memberId;
+                    // Calculate confidence (0 to 100%)
+                    // Lower distance means higher confidence
+                    // 0.6 is the threshold, 0 would be perfect match
+                    const calculatedConfidence = Math.round((1 - distance / 0.6) * 100);
+                    // Ensure confidence is between 0 and 100
+                    confidence = Math.max(0, Math.min(100, calculatedConfidence));
+                    
+                    // Only consider it a match if confidence is at least 50%
+                    if (confidence >= minimumConfidence) {
+                        bestMatch = memberId;
+                    } else {
+                        // Below minimum confidence threshold, don't consider it a match
+                        bestMatch = null;
+                    }
                 }
             }
 
@@ -196,17 +211,25 @@ class FaceRecognition {
             const rect = document.getElementById('face-rectangle');
             if (rect) {
                 if (bestMatch === null && Object.keys(this.faceDescriptors).length > 0) {
-                    // Face detected but not recognized - red frame
+                    // Face detected but not recognized or below confidence threshold - red frame
                     rect.style.border = '2px solid #FF0000';
                     // Clear fields when unrecognized face is detected
                     this.clearRecognizedId();
                     
-                    // Add marquee message for face registration
-                    this.showFaceRegistrationMessage();
-                } else {
-                    // Face recognized or no face data available - green frame
+                    // Add message for face registration with confidence level
+                    // If we found a potential match but below threshold, show that confidence
+                    this.showFaceRegistrationMessage(confidence); 
+                } else if (bestMatch !== null) {
+                    // Face recognized with sufficient confidence - green frame
                     rect.style.border = '2px solid #00FF00';
                     // Remove face registration message when face is recognized
+                    this.removeFaceRegistrationMessage();
+                    // Display confidence level
+                    this.showConfidenceLevel(confidence, bestMatch);
+                } else {
+                    // No face data available - green frame
+                    rect.style.border = '2px solid #00FF00';
+                    // Remove face registration message
                     this.removeFaceRegistrationMessage();
                 }
             }
@@ -262,15 +285,18 @@ class FaceRecognition {
     }
 
     /**
-     * Show face registration message
+     * Show face registration message with confidence level
+     * @param {number} confidence - Confidence level (0-100)
      */
-    showFaceRegistrationMessage() {
+    showFaceRegistrationMessage(confidence = 0) {
         // Ensure container exists
         this.initMessageContainer();
         
-        // Show the message
+        // Show the message with confidence level
         const message = document.getElementById('face-registration-message');
         if (message) {
+            message.textContent = `認識できない顔を検出しました。顔情報を登録できます。(確からしさ: ${confidence}%)`;
+            message.style.color = '#FF0000'; // Ensure text is red
             message.style.display = 'block';
             
             // Record the time when the message was shown
@@ -281,6 +307,43 @@ class FaceRecognition {
                 clearTimeout(this.messageHideTimeout);
                 this.messageHideTimeout = null;
             }
+        }
+    }
+
+    /**
+     * Show confidence level for recognized face
+     * @param {number} confidence - Confidence level (0-100)
+     * @param {string} memberId - Recognized member ID
+     */
+    showConfidenceLevel(confidence, memberId) {
+        // Ensure container exists
+        this.initMessageContainer();
+        
+        // Show confidence level message
+        const message = document.getElementById('face-registration-message');
+        if (message) {
+            message.textContent = `顔を認識しました: ID ${memberId} (確からしさ: ${confidence}%)`;
+            message.style.color = '#008800'; // Green color for recognized face
+            message.style.display = 'block';
+            
+            // Record the time when the message was shown
+            this.messageShowTime = Date.now();
+            
+            // Clear any existing hide timeout
+            if (this.messageHideTimeout) {
+                clearTimeout(this.messageHideTimeout);
+                this.messageHideTimeout = null;
+            }
+            
+            // Set timeout to hide the message after 3 seconds
+            this.messageHideTimeout = setTimeout(() => {
+                if (message) {
+                    message.style.display = 'none';
+                    // Reset color for future messages
+                    message.style.color = '#FF0000';
+                }
+                this.messageHideTimeout = null;
+            }, 3000);
         }
     }
 
