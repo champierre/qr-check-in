@@ -11,8 +11,12 @@ class FaceRecognition {
         this.faceDescriptors = {};
         this.lastFaceDetectionTime = Date.now();
         this.noFaceTimeout = null;
+        this.messageShowTime = 0; // Track when the message was shown
+        this.messageHideTimeout = null; // Timeout for hiding the message
         this.loadFaceData();
         this.initModels();
+        // Initialize the message container to reserve space
+        setTimeout(() => this.initMessageContainer(), 500); // Slight delay to ensure DOM is ready
     }
 
     /**
@@ -112,6 +116,9 @@ class FaceRecognition {
                     rect.style.display = 'none';
                 }
 
+                // Remove face registration message when no face is detected
+                this.removeFaceRegistrationMessage();
+
                 // Start timer to clear ID if no face is detected for 5 seconds
                 const currentTime = Date.now();
                 if (!this.noFaceTimeout) {
@@ -193,9 +200,14 @@ class FaceRecognition {
                     rect.style.border = '2px solid #FF0000';
                     // Clear fields when unrecognized face is detected
                     this.clearRecognizedId();
+                    
+                    // Add marquee message for face registration
+                    this.showFaceRegistrationMessage();
                 } else {
                     // Face recognized or no face data available - green frame
                     rect.style.border = '2px solid #00FF00';
+                    // Remove face registration message when face is recognized
+                    this.removeFaceRegistrationMessage();
                 }
             }
 
@@ -203,6 +215,100 @@ class FaceRecognition {
         } catch (error) {
             console.error('Error recognizing face:', error);
             return null;
+        }
+    }
+
+    /**
+     * Initialize message container
+     * Creates a container for the face registration message that maintains its height
+     */
+    initMessageContainer() {
+        // Check if container already exists
+        if (document.getElementById('face-registration-container')) {
+            return;
+        }
+
+        // Find the face registration link container
+        const instructionDiv = document.querySelector('#instructions .instruction');
+        if (!instructionDiv) return;
+
+        // Create container element with fixed height
+        const container = document.createElement('div');
+        container.id = 'face-registration-container';
+        container.style.height = '24px'; // Fixed height to prevent layout shifts
+        container.style.margin = '10px 0';
+        container.style.width = '100%';
+        container.style.textAlign = 'center'; // Center-align the text
+        
+        // Create message element inside container (initially hidden)
+        const messageElement = document.createElement('p');
+        messageElement.id = 'face-registration-message';
+        messageElement.textContent = '認識できない顔を検出しました。顔情報を登録できます。';
+        messageElement.style.color = '#FF0000';
+        messageElement.style.fontWeight = 'bold';
+        messageElement.style.margin = '0';
+        messageElement.style.display = 'none'; // Initially hidden
+        messageElement.style.textAlign = 'center'; // Ensure text is centered
+        
+        container.appendChild(messageElement);
+        
+        // Insert after the face registration link
+        const linkParagraph = instructionDiv.querySelector('p:nth-child(2)');
+        if (linkParagraph) {
+            linkParagraph.after(container);
+        } else {
+            instructionDiv.appendChild(container);
+        }
+    }
+
+    /**
+     * Show face registration message
+     */
+    showFaceRegistrationMessage() {
+        // Ensure container exists
+        this.initMessageContainer();
+        
+        // Show the message
+        const message = document.getElementById('face-registration-message');
+        if (message) {
+            message.style.display = 'block';
+            
+            // Record the time when the message was shown
+            this.messageShowTime = Date.now();
+            
+            // Clear any existing hide timeout
+            if (this.messageHideTimeout) {
+                clearTimeout(this.messageHideTimeout);
+                this.messageHideTimeout = null;
+            }
+        }
+    }
+
+    /**
+     * Hide face registration message
+     */
+    removeFaceRegistrationMessage() {
+        const message = document.getElementById('face-registration-message');
+        if (!message) return;
+        
+        // Check if 5 seconds have passed since the message was shown
+        const currentTime = Date.now();
+        const elapsedTime = currentTime - this.messageShowTime;
+        const minimumDisplayTime = 5000; // 5 seconds
+        
+        if (elapsedTime >= minimumDisplayTime) {
+            // 5 seconds have passed, hide the message immediately
+            message.style.display = 'none';
+        } else if (!this.messageHideTimeout) {
+            // Less than 5 seconds have passed, set a timeout to hide after the remaining time
+            const remainingTime = minimumDisplayTime - elapsedTime;
+            this.messageHideTimeout = setTimeout(() => {
+                const messageElement = document.getElementById('face-registration-message');
+                if (messageElement) {
+                    messageElement.style.display = 'none';
+                }
+                this.messageHideTimeout = null;
+            }, remainingTime);
         }
     }
 }
