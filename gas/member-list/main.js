@@ -16,6 +16,19 @@ function doGet(e) {
                 return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON);
             }
             break;
+        case "getFaces":
+            {
+                const dataSheet = activeSpreadSheet.getSheetByName('Faces');
+                const data = dataSheet.getDataRange().getValues();
+                const result = {};
+                const dataWithoutHeader = data.slice(1);
+                dataWithoutHeader.forEach(row => {
+                  result[row[1]] = row[2];
+                });
+
+                return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+            }
+            break;
         default:
             {
                 const result = 'did nothing';
@@ -326,4 +339,85 @@ function copyRegisterToData() {
 function createCards() {
     copyRegisterToData();
     fillEmptyCardUrl();
+}
+
+function doPost(e) {
+  const reqParam = JSON.parse(e.postData.getDataAsString());
+
+  switch (reqParam.action) {
+    case "createFace":
+      {
+        const result = createFace(reqParam);
+        return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+      }
+      break;
+    default:
+      {
+        const result = 'did nothing';
+        return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+      }
+      break;
+  }
+}
+
+function toDateTimeEntry(epochTime) {
+  const date = new Date(epochTime);
+  //get timezone of spreadsheet
+  var tz = SpreadsheetApp.getActiveSpreadsheet().getSpreadsheetTimeZone();
+
+  //format date to readable format
+  var formatted = Utilities.formatDate(date, tz, 'yyyy/MM/dd HH:mm:ss');
+
+  return formatted;
+}
+
+function createFace(faceData) {
+  // Check if member data exists for the given ID
+  const memberData = getMemberData(faceData.memberId);
+  
+  if (memberData) {
+    // Member exists, proceed with face data
+    const dataSheet = activeSpreadSheet.getSheetByName('Faces');
+    const data = dataSheet.getDataRange().getValues();
+    const timestamp = toDateTimeEntry(Date.now());
+    
+    // Check if there's already a face record with this memberId
+    let existingRowIndex = -1;
+    for (let i = 0; i < data.length; i++) {
+      if (data[i][1] === faceData.memberId) {
+        existingRowIndex = i;
+        break;
+      }
+    }
+    
+    if (existingRowIndex !== -1) {
+      // Update existing row
+      // Add 1 to account for 1-based indexing in Sheets API
+      const rowNumber = existingRowIndex + 1;
+      dataSheet.getRange(rowNumber, 1).setValue(timestamp); // Update timestamp
+      dataSheet.getRange(rowNumber, 3).setValue(faceData.descriptor); // Update descriptor
+      return {
+        updated: true,
+        timestamp: timestamp,
+        id: faceData.memberId,
+        descriptor: faceData.descriptor
+      };
+    } else {
+      // Add new row
+      dataSheet.appendRow([
+        timestamp,
+        faceData.memberId,
+        faceData.descriptor
+      ]);
+      return {
+        added: true,
+        timestamp: timestamp,
+        id: faceData.memberId,
+        descriptor: faceData.descriptor
+      };
+    }
+  } else {
+    // Member does not exist, return error message
+    return {error: true, message: `No user information found for ID: ${faceData.memberId}`};
+  }
 }

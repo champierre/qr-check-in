@@ -60,6 +60,16 @@ class MemberRegister {
         }
         return await retryWithDelay(posting, 3, 200, 'check in failed')
     }
+
+    async getFaces() {
+        const response = await fetch(this.findUrl + '?action=getFaces')
+        if (response.ok) {
+            const data = await response.json();
+            return data;
+        } else {
+            return null;
+        }
+    }
 }
 
 function wait(ms) {
